@@ -48,4 +48,3 @@ dist/
 nbdist/
 docker/zookeeper
 docker/kafka
-/temp.txt
