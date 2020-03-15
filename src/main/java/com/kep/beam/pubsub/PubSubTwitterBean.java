@@ -35,7 +35,7 @@ public class PubSubTwitterBean {
     ).apply("GetUserData", ParDo.of(new GetUserDataDoFn())//
     ).apply("FilterUsersWithMoreThanXFollowers", ParDo.of(new FilterUsersWithMoreThanXFollowersDoFn())//
     ).apply("ParseUserToJson", MapElements.into(TypeDescriptors.strings()).via(user -> new Gson().toJson(user))//
-    ).apply(Window.into(FixedWindows.of(Duration.standardSeconds(5)))//
+    ).apply(Window.into(FixedWindows.of(Duration.standardSeconds(options.getWindowInSeconds())))//
     ).apply("WriteUsersToTopic", PubsubIO.writeStrings().to(topicOut));
 
     LOGGER.debug("Starting pipeline");
