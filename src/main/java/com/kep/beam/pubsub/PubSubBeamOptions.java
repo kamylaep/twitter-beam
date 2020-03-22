@@ -13,9 +13,25 @@ public interface PubSubBeamOptions extends GcpOptions, PipelineOptions {
 
   void setWriteShards(int writeShards);
 
+  /**
+   * Use getUserInput or getTweetInput.
+   */
+  @Deprecated
   String getInput();
 
+  @Deprecated
+  /**
+   * Use setUserInput or setTweetInput.
+   */
   void setInput(String input);
+
+  String getUserInput();
+
+  void setUserInput(String userInput);
+
+  String getTweetInput();
+
+  void setTweetInput(String tweetInput);
 
   String getOutput();
 
@@ -24,5 +40,9 @@ public interface PubSubBeamOptions extends GcpOptions, PipelineOptions {
   Integer getFollowersCount();
 
   void setFollowersCount(Integer followersCount);
+
+  String getTweetSource();
+
+  void setTweetSource(String tweetSource);
 
 }
