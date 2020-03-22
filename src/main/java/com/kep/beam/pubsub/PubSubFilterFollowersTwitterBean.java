@@ -1,58 +1,53 @@
-package com.kep.beam.kafka;
+package com.kep.beam.pubsub;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.io.kafka.KafkaIO;
+import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.transforms.windowing.FixedWindows;
 import org.apache.beam.sdk.transforms.windowing.Window;
-import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.TypeDescriptors;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.kep.beam.kafka.KafkaTwitterBean;
 
-public class KafkaTwitterBean {
+public class PubSubFilterFollowersTwitterBean {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(PubSubFilterFollowersTwitterBean.class);
 
   public static void main(String[] args) {
-    PipelineOptionsFactory.register(KafkaBeanOptions.class);
-    KafkaBeanOptions options = PipelineOptionsFactory.fromArgs(args).withValidation().as(KafkaBeanOptions.class);
+    PipelineOptionsFactory.register(PubSubBeamOptions.class);
+    PubSubBeamOptions options = PipelineOptionsFactory.fromArgs(args).withValidation().as(PubSubBeamOptions.class);
     Pipeline pipeline = Pipeline.create(options);
+    LOGGER.debug("Registering app options={}", options);
 
-    pipeline.apply("ReadTwitterTopic", KafkaIO.<String, String>read()//
-        .withBootstrapServers(options.getKafkaBootstrapServer())//
-        .withTopic(options.getInput())//
-        .withKeyDeserializer(StringDeserializer.class)//
-        .withValueDeserializer(StringDeserializer.class)//
-        .withoutMetadata()//
-    ).apply(Values.create()//
+    String project = "projects/" + options.getProject();
+    String subscription = project + "/subscriptions/" + options.getInput();
+    String topicOut = project + "/topics/" + options.getOutput();
+
+    LOGGER.debug("Building pipeline");
+    pipeline.apply("ReadTwitterTopic", PubsubIO.readStrings().fromSubscription(subscription)//
     ).apply("GetUserData", ParDo.of(new GetUserDataDoFn())//
     ).apply("FilterUsersWithMoreThanXFollowers", ParDo.of(new FilterUsersWithMoreThanXFollowersDoFn())//
-    ).apply("ParseUserToJson", MapElements.into(TypeDescriptors.kvs(TypeDescriptors.strings(), TypeDescriptors.strings()))
-        .via(user -> KV.of(user.get("id"), new Gson().toJson(user)))//
-    ).apply(Window.into(FixedWindows.of(Duration.standardSeconds(5)))//
-    ).apply("WriteUsersToTopic", KafkaIO.<String, String>write()//
-        .withBootstrapServers(options.getKafkaBootstrapServer())//
-        .withTopic(options.getOutput())//
-        .withKeySerializer(StringSerializer.class)//
-        .withValueSerializer(StringSerializer.class));
+    ).apply("ParseUserToJson", MapElements.into(TypeDescriptors.strings()).via(user -> new Gson().toJson(user))//
+    ).apply(Window.into(FixedWindows.of(Duration.standardSeconds(options.getWindowInSeconds())))//
+    ).apply("WriteUsersToTopic", PubsubIO.writeStrings().to(topicOut));
 
+    LOGGER.debug("Starting pipeline");
     pipeline.run().waitUntilFinish();
   }
 
   public static class GetUserDataDoFn extends DoFn<String, Map<String, String>> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GetUserDataDoFn.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaTwitterBean.GetUserDataDoFn.class);
 
     @ProcessElement
     public void processElement(@Element String jsonTweet, OutputReceiver<Map<String, String>> outputReceiver) {
@@ -82,7 +77,7 @@ public class KafkaTwitterBean {
     public void processElement(ProcessContext c) {
       LOGGER.debug("Starting filter users");
 
-      KafkaBeanOptions options = c.getPipelineOptions().as(KafkaBeanOptions.class);
+      PubSubBeamOptions options = c.getPipelineOptions().as(PubSubBeamOptions.class);
       Double followersCount = Double.parseDouble(c.element().get("followers_count"));
       if (followersCount > options.getFollowersCount()) {
         LOGGER.trace("Filtered user={}", c.element());

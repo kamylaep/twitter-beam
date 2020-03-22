@@ -53,14 +53,14 @@ $ mvn compile exec:java -Dexec.mainClass=com.kep.beam.kafka.KafkaTwitterBean \
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO-CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubTwitterBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubFilterFollowersTwitterBean \
 -Dexec.args="--project=<PROJECT_ID> --input=sub-twitter-in --output=twitter-users-with-more-than-200-followers --followersCount=200 --windowInSeconds=60" \
 -Pdirect-runner
 ```
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALSe=<PATH-TO-CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubTwitterBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubFilterFollowersTwitterBean \
 -Dexec.args="--project=<PROJECT_ID> --input=sub-twitter-in --output=twitter-users-with-more-than-200-followers --followersCount=200 --windowInSeconds=60 --runner=dataflow --streaming=true" \
 -Pdataflow-runner
 ```
