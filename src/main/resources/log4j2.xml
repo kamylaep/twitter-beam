@@ -6,7 +6,7 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Logger name="com.kep" level="${env:APP_LOG_LEVEL:-warn}">
+    <Logger name="com.kep" level="${env:APP_LOG_LEVEL:-warn}" additivity="false">
       <AppenderRef ref="LogToConsole"/>
     </Logger>
     <Root level="${env:LOG_LEVEL:-warn}">
