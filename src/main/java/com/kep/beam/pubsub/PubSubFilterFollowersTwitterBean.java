@@ -11,6 +11,7 @@ import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.windowing.FixedWindows;
 import org.apache.beam.sdk.transforms.windowing.Window;
+import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -25,6 +26,10 @@ public class PubSubFilterFollowersTwitterBean {
   private static final Logger LOGGER = LoggerFactory.getLogger(PubSubFilterFollowersTwitterBean.class);
 
   public static void main(String[] args) {
+    new PubSubFilterFollowersTwitterBean().start(args);
+  }
+
+  private void start(String[] args) {
     PipelineOptionsFactory.register(PubSubBeamOptions.class);
     PubSubBeamOptions options = PipelineOptionsFactory.fromArgs(args).withValidation().as(PubSubBeamOptions.class);
     Pipeline pipeline = Pipeline.create(options);
@@ -35,18 +40,26 @@ public class PubSubFilterFollowersTwitterBean {
     String topicOut = project + "/topics/" + options.getOutput();
 
     LOGGER.debug("Building pipeline");
-    pipeline.apply("ReadTwitterTopic", PubsubIO.readStrings().fromSubscription(subscription)//
-    ).apply("GetUserData", ParDo.of(new GetUserDataDoFn())//
-    ).apply("FilterUsersWithMoreThanXFollowers", ParDo.of(new FilterUsersWithMoreThanXFollowersDoFn())//
-    ).apply("ParseUserToJson", MapElements.into(TypeDescriptors.strings()).via(user -> new Gson().toJson(user))//
-    ).apply(Window.into(FixedWindows.of(Duration.standardSeconds(options.getWindowInSeconds())))//
-    ).apply("WriteUsersToTopic", PubsubIO.writeStrings().to(topicOut));
+    PCollection<String> input = pipeline.apply("ReadTwitterTopic", PubsubIO.readStrings().fromSubscription(subscription));
+
+    PCollection<String> output = buildPipeline(options, input);
+
+    output.apply("WriteUsersToTopic", PubsubIO.writeStrings().to(topicOut));
 
     LOGGER.debug("Starting pipeline");
     pipeline.run().waitUntilFinish();
   }
 
+  protected PCollection<String> buildPipeline(PubSubBeamOptions options, PCollection<String> input) {
+    return input
+        .apply("GetUserData", ParDo.of(new GetUserDataDoFn()))
+        .apply("FilterUsersWithMoreThanXFollowers", ParDo.of(new FilterUsersWithMoreThanXFollowersDoFn()))
+        .apply("ParseUserToJson", MapElements.into(TypeDescriptors.strings()).via(user -> new Gson().toJson(user)))
+        .apply(Window.into(FixedWindows.of(Duration.standardSeconds(options.getWindowInSeconds()))));
+  }
+
   public static class GetUserDataDoFn extends DoFn<String, Map<String, String>> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaTwitterBean.GetUserDataDoFn.class);
 
     @ProcessElement
@@ -55,13 +68,12 @@ public class PubSubFilterFollowersTwitterBean {
       LOGGER.trace("Received tweet={}", jsonTweet);
 
       Gson gson = new Gson();
-      JsonObject tweet = gson.fromJson(jsonTweet, JsonObject.class);
-      JsonObject user = tweet.getAsJsonObject("user");
+      JsonObject user = gson.fromJson(jsonTweet, JsonObject.class);
 
       Map<String, String> out = new HashMap<>();
-      out.put("id", user.get("id").getAsString());
-      out.put("screen_name", user.get("screen_name").getAsString());
-      out.put("followers_count", user.get("followers_count").getAsString());
+      out.put("user.id", user.get("user.id").getAsString());
+      out.put("user.screen_name", user.get("user.screen_name").getAsString());
+      out.put("user.followers_count", user.get("user.followers_count").getAsString());
       outputReceiver.output(out);
 
       LOGGER.debug("Finishing extract user data from tweet");
@@ -78,8 +90,8 @@ public class PubSubFilterFollowersTwitterBean {
       LOGGER.debug("Starting filter users");
 
       PubSubBeamOptions options = c.getPipelineOptions().as(PubSubBeamOptions.class);
-      Double followersCount = Double.parseDouble(c.element().get("followers_count"));
-      if (followersCount > options.getFollowersCount()) {
+      Double followersCount = Double.parseDouble(c.element().get("user.followers_count"));
+      if (followersCount >= options.getFollowersCount()) {
         LOGGER.trace("Filtered user={}", c.element());
         c.output(c.element());
       }
