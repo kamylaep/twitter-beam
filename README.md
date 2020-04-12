@@ -75,7 +75,7 @@ mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubFilterFollowers
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO-CREDENTIALS> && \
 mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubCountWordsTwitterBean \
--Dexec.args="--project=<PROJECT_ID> --input=sub-twitter-tweet --output=gs://twitter-count-beam/count/tweet-count --windowInSeconds=60 --writeShards=2" \
+-Dexec.args="--project=<PROJECT_ID> --tweetInput=sub-twitter-tweet --output=gs://twitter-count-beam/count/tweet-count --windowInSeconds=60 --writeShards=2" \
 -Pdirect-runner
 ```
 
@@ -84,7 +84,7 @@ mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubCountWordsTwitt
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO-CREDENTIALS> && \
 mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.PubSubCountWordsTwitterBean \
--Dexec.args="--project=<PROJECT_ID> --input=sub-twitter-tweet --output=gs://twitter-count-beam/count/tweet-count --windowInSeconds=60 --writeShards=2 --runner=dataflow --streaming=true" \
+-Dexec.args="--project=<PROJECT_ID> --tweetInput=sub-twitter-tweet --output=gs://twitter-count-beam/count/tweet-count --windowInSeconds=60 --writeShards=2 --runner=dataflow --streaming=true" \
 -Pdataflow-runner
 ```
 
