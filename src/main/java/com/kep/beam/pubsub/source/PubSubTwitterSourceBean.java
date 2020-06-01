@@ -1,4 +1,4 @@
-package com.kep.beam.pubsub;
+package com.kep.beam.pubsub.source;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.kep.beam.pubsub.options.PubSubBeamOptions;
 
 import lombok.Value;
 

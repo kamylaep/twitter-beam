@@ -1,4 +1,4 @@
-package com.kep.beam.pubsub;
+package com.kep.beam.pubsub.countwords;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -21,6 +21,7 @@ import org.joda.time.Duration;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.kep.beam.pubsub.options.PubSubBeamOptions;
 
 import lombok.AllArgsConstructor;
 

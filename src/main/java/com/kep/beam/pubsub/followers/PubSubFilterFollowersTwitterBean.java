@@ -1,4 +1,4 @@
-package com.kep.beam.pubsub;
+package com.kep.beam.pubsub.followers;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.kep.beam.kafka.KafkaTwitterBean;
+import com.kep.beam.pubsub.options.PubSubBeamOptions;
 
 import lombok.AllArgsConstructor;
 

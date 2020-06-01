@@ -1,4 +1,4 @@
-package com.kep.beam.pubsub;
+package com.kep.beam.pubsub.countwords;
 
 import java.util.Arrays;
 
@@ -9,7 +9,8 @@ import org.apache.beam.sdk.values.PCollection;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.kep.beam.pubsub.PubSubCountWordsTwitterBean.ProcessTweet;
+import com.kep.beam.pubsub.countwords.PubSubCountWordsTwitterBean.ProcessTweet;
+import com.kep.beam.pubsub.options.PubSubBeamOptions;
 
 public class PubSubCountWordsTwitterBeanTest {
 

@@ -1,4 +1,4 @@
-package com.kep.beam.pubsub;
+package com.kep.beam.pubsub.options;
 
 import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
 import org.apache.beam.sdk.options.PipelineOptions;

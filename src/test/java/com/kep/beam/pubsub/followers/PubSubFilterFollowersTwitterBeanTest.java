@@ -1,4 +1,4 @@
-package com.kep.beam.pubsub;
+package com.kep.beam.pubsub.followers;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
@@ -17,7 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import com.google.gson.Gson;
-import com.kep.beam.pubsub.PubSubFilterFollowersTwitterBean.ProcessTwitter;
+import com.kep.beam.pubsub.followers.PubSubFilterFollowersTwitterBean.ProcessTwitter;
+import com.kep.beam.pubsub.options.PubSubBeamOptions;
 
 public class PubSubFilterFollowersTwitterBeanTest {
 
