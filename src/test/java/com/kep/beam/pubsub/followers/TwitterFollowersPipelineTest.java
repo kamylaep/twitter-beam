@@ -17,10 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import com.google.gson.Gson;
-import com.kep.beam.pubsub.followers.PubSubFilterFollowersTwitterBean.ProcessTwitter;
-import com.kep.beam.pubsub.options.PubSubBeamOptions;
 
-public class PubSubFilterFollowersTwitterBeanTest {
+public class TwitterFollowersPipelineTest {
 
     public static final int FOLLOWERS_COUNT = 200;
     @Rule
@@ -28,7 +26,7 @@ public class PubSubFilterFollowersTwitterBeanTest {
 
     @Test
     public void shouldCountTweetWords() {
-        PubSubBeamOptions options = testPipeline.getOptions().as(PubSubBeamOptions.class);
+        FollowersOptions options = testPipeline.getOptions().as(FollowersOptions.class);
         List<String> inputData = createInputData();
         PCollection<String> output = testPipeline
             .apply("Create input", Create.of(inputData))
@@ -37,8 +35,8 @@ public class PubSubFilterFollowersTwitterBeanTest {
         testPipeline.run().waitUntilFinish();
     }
 
-    private PubSubBeamOptions buildOptions() {
-        PubSubBeamOptions pipelineOptions = TestPipeline.testingPipelineOptions().as(PubSubBeamOptions.class);
+    private FollowersOptions buildOptions() {
+        FollowersOptions pipelineOptions = TestPipeline.testingPipelineOptions().as(FollowersOptions.class);
         pipelineOptions.setWindowInSeconds(10);
         pipelineOptions.setFollowersCount(FOLLOWERS_COUNT);
         return pipelineOptions;
@@ -65,7 +63,8 @@ public class PubSubFilterFollowersTwitterBeanTest {
         return input.stream()
             .map(a -> gson.fromJson(a, Map.class))
             .filter(m -> Long.parseLong(m.get("user.followers_count").toString()) > FOLLOWERS_COUNT)
-            .map(m -> "{\"user.id\":\"" + m.get("user.id") + "\",\"user.followers_count\":\"" + m.get("user.followers_count")
+            .map(m -> "{\"user.id\":\"" + m.get("user.id") +
+                "\",\"user.followers_count\":\"" + m.get("user.followers_count")
                 + "\",\"user.screen_name\":\"" + m.get("user.screen_name") + "\"}")
             .collect(Collectors.toList());
     }

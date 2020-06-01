@@ -54,7 +54,7 @@ To execute the pipeline:
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO-CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.followers.PubSubFilterFollowersTwitterBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.followers.TwitterFollowersPipeline \
 -Dexec.args="--project=<PROJECT_ID> --userInput=sub-twitter-user --output=twitter-users-with-more-than-200-followers --followersCount=200 --windowInSeconds=60" \
 -Pdirect-runner
 ```
@@ -63,7 +63,7 @@ mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.followers.PubSubFilte
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALSe=<PATH-TO-CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.followers.PubSubFilterFollowersTwitterBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.followers.TwitterFollowersPipeline \
 -Dexec.args="--project=<PROJECT_ID> --userInput=sub-twitter-user --output=twitter-users-with-more-than-200-followers --followersCount=200 --windowInSeconds=60 --runner=dataflow --streaming=true" \
 -Pdataflow-runner
 ```
@@ -74,7 +74,7 @@ mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.followers.PubSubFilte
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO-CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.countwords.PubSubCountWordsTwitterBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.countwords.CountWordsTweetPipeline \
 -Dexec.args="--project=<PROJECT_ID> --tweetInput=sub-twitter-tweet --output=gs://twitter-count-beam/count/tweet-count --windowInSeconds=60 --writeShards=2" \
 -Pdirect-runner
 ```
@@ -83,7 +83,7 @@ mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.countwords.PubSubCoun
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO-CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.countwords.PubSubCountWordsTwitterBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.countwords.CountWordsTweetPipeline \
 -Dexec.args="--project=<PROJECT_ID> --tweetInput=sub-twitter-tweet --output=gs://twitter-count-beam/count/tweet-count --windowInSeconds=60 --writeShards=2 --runner=dataflow --streaming=true" \
 -Pdataflow-runner
 ```
