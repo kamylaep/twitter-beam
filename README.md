@@ -94,7 +94,7 @@ mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.countwords.CountWords
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO_CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.source.PubSubTwitterSourceBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.source.TwitterSourcePipeline \
 -Dexec.args="--project=<PROJECT_ID> --tweetInput=sub-twitter-tweet --userInput=sub-twitter-user --output=twitter-from-android --tweetSource=android --windowInSeconds=60" \
 -Pdirect-runner
 ```
@@ -103,7 +103,7 @@ mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.source.PubSubTwitterS
 
 ```shell script
 $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH-TO_CREDENTIALS> && \
-mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.source.PubSubTwitterSourceBean \
+mvn compile exec:java -Dexec.mainClass=com.kep.beam.pubsub.source.TwitterSourcePipeline \
 -Dexec.args="--project=<PROJECT_ID> --tweetInput=sub-twitter-tweet --userInput=sub-twitter-user --output=twitter-from-android --tweetSource=android --windowInSeconds=60 --runner=dataflow --streaming=true" \
 -Pdataflow-runner
 ```

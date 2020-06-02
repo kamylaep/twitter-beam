@@ -1,17 +1,13 @@
-package com.kep.beam.pubsub.options;
+package com.kep.beam.pubsub.source;
 
 import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
 import org.apache.beam.sdk.options.PipelineOptions;
 
-public interface PubSubBeamOptions extends GcpOptions, PipelineOptions {
+public interface SourceOptions extends GcpOptions, PipelineOptions {
 
   long getWindowInSeconds();
 
   void setWindowInSeconds(long windowInSeconds);
-
-  int getWriteShards();
-
-  void setWriteShards(int writeShards);
 
   String getUserInput();
 
@@ -24,10 +20,6 @@ public interface PubSubBeamOptions extends GcpOptions, PipelineOptions {
   String getOutput();
 
   void setOutput(String output);
-
-  Integer getFollowersCount();
-
-  void setFollowersCount(Integer followersCount);
 
   String getTweetSource();
 
