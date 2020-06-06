@@ -22,21 +22,22 @@ import com.google.gson.Gson;
 
 public class TwitterSourcePipelineTest {
 
+    public static final String SOURCE = "android";
     @Rule
     public final transient TestPipeline testPipeline = TestPipeline.fromOptions(buildOptions());
 
     private Gson gson = new Gson();
 
     @Test
-    public void test() {
+    public void shouldReturnOnlyUsersThatTweetedFromAndroid() {
         List<String> inputUserData = createInputUserData();
-        PCollection<KV<String, Map<String, String>>> users = testPipeline
+        PCollection<KV<String, InputUserData>> users = testPipeline
             .apply("ReadUsersTopic", Create.of(inputUserData))
-            .apply("UserJsonToVK", ParDo.of(new JsonToKVFn()));
+            .apply("UserJsonToVK", ParDo.of(new JsonToKVFn<InputUserData>(InputUserData.class)));
 
-        PCollection<KV<String, Map<String, String>>> tweets = testPipeline
+        PCollection<KV<String, InputTweetData>> tweets = testPipeline
             .apply("ReadTweetsTopic", Create.of(createInputTweetData(inputUserData)))
-            .apply("TweetJsonToKV", ParDo.of(new JsonToKVFn()));
+            .apply("TweetJsonToKV", ParDo.of(new JsonToKVFn<InputTweetData>(InputTweetData.class)));
 
         PCollection<String> result = KeyedPCollectionTuple.of(TwitterSourcePipeline.USER_TAG, users).and(TWEET_TAG, tweets)
             .apply("ProcessData", new ProcessData());
@@ -51,7 +52,7 @@ public class TwitterSourcePipelineTest {
     private SourceOptions buildOptions() {
         SourceOptions pipelineOptions = TestPipeline.testingPipelineOptions().as(SourceOptions.class);
         pipelineOptions.setWindowInSeconds(10);
-        pipelineOptions.setTweetSource("android");
+        pipelineOptions.setTweetSource(SOURCE);
         return pipelineOptions;
     }
 
@@ -74,22 +75,22 @@ public class TwitterSourcePipelineTest {
     private List<String> createInputTweetData(List<String> inputUserData) {
         Map<String, String> twee1 = new HashMap<>();
         twee1.put("user.id", "1");
-        twee1.put("source", "android");
+        twee1.put("source", SOURCE);
         twee1.put("text", "text1");
 
         Map<String, String> twee2 = new HashMap<>();
         twee2.put("user.id", "1");
-        twee2.put("source", "android");
+        twee2.put("source", SOURCE);
         twee2.put("text", "text2");
 
         Map<String, String> twee3 = new HashMap<>();
         twee3.put("user.id", "1");
-        twee3.put("source", "ios");
+        twee3.put("source", "iphone");
         twee3.put("text", "text3");
 
         Map<String, String> twee4 = new HashMap<>();
         twee4.put("user.id", "2");
-        twee4.put("source", "android");
+        twee4.put("source", SOURCE);
         twee4.put("text", "text4");
 
         return Arrays.asList(gson.toJson(twee1), gson.toJson(twee2), gson.toJson(twee3), gson.toJson(twee4));

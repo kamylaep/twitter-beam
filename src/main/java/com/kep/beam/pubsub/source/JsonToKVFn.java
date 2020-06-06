@@ -1,17 +1,20 @@
 package com.kep.beam.pubsub.source;
 
-import java.util.Map;
-
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
 
 import com.google.gson.Gson;
 
-public class JsonToKVFn extends DoFn<String, KV<String, Map<String, String>>> {
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
+public class JsonToKVFn<T extends InputData> extends DoFn<String, KV<String, T>> {
+
+    private Class<T> jsonClass;
 
     @ProcessElement
-    public void processElement(@Element String json, OutputReceiver<KV<String, Map<String, String>>> outputReceiver) {
-        Map<String, String> map = new Gson().fromJson(json, Map.class);
-        outputReceiver.output(KV.of(map.get("user.id"), map));
+    public void processElement(@Element String json, OutputReceiver<KV<String, T>> outputReceiver) {
+        T data = new Gson().fromJson(json, jsonClass);
+        outputReceiver.output(KV.of(data.getUserId(), data));
     }
 }

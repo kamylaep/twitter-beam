@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Value;
 
 @Value(staticConstructor = "of")
-public class TweetData implements Serializable {
+public class OutputTweetData implements Serializable {
 
     private String username;
     private List<String> tweets;

@@ -1,7 +1,5 @@
 package com.kep.beam.pubsub.source;
 
-import java.util.Map;
-
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
@@ -19,8 +17,8 @@ import com.google.pubsub.v1.ProjectTopicName;
 
 public class TwitterSourcePipeline {
 
-    public static final TupleTag<Map<String, String>> USER_TAG = new TupleTag<>();
-    public static final TupleTag<Map<String, String>> TWEET_TAG = new TupleTag<>();
+    public static final TupleTag<InputUserData> USER_TAG = new TupleTag<>();
+    public static final TupleTag<InputTweetData> TWEET_TAG = new TupleTag<>();
 
     public static void main(String[] args) {
         PipelineOptionsFactory.register(SourceOptions.class);
@@ -31,15 +29,15 @@ public class TwitterSourcePipeline {
         String tweetSubscription = ProjectSubscriptionName.format(options.getProject(), options.getTweetInput());;
         String topicOut = ProjectTopicName.format(options.getProject(), options.getOutput());
 
-        PCollection<KV<String, Map<String, String>>> users = pipeline
+        PCollection<KV<String, InputUserData>> users = pipeline
             .apply("ReadUsersTopic", PubsubIO.readStrings().fromSubscription(userSubscription))
             .apply("UserWindow", Window.into(FixedWindows.of(Duration.standardSeconds(options.getWindowInSeconds()))))
-            .apply("UserJsonToVK", ParDo.of(new JsonToKVFn()));
+            .apply("UserJsonToVK", ParDo.of(new JsonToKVFn<InputUserData>(InputUserData.class)));
 
-        PCollection<KV<String, Map<String, String>>> tweets = pipeline
+        PCollection<KV<String, InputTweetData>> tweets = pipeline
             .apply("ReadTweetsTopic", PubsubIO.readStrings().fromSubscription(tweetSubscription))
             .apply("TweetWindow", Window.into(FixedWindows.of(Duration.standardSeconds(options.getWindowInSeconds()))))
-            .apply("TweetJsonToKV", ParDo.of(new JsonToKVFn()));
+            .apply("TweetJsonToKV", ParDo.of(new JsonToKVFn<InputTweetData>(InputTweetData.class)));
 
         KeyedPCollectionTuple.of(USER_TAG, users).and(TWEET_TAG, tweets)
             .apply("ProcessData", new ProcessData())

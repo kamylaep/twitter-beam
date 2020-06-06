@@ -48,3 +48,4 @@ dist/
 nbdist/
 docker/zookeeper
 docker/kafka
+/.factorypath
