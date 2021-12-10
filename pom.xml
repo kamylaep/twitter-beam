@@ -26,7 +26,7 @@
         <pubsub.version>v1-rev20191111-1.28.0</pubsub.version>
         <hamcrest.version>2.2</hamcrest.version>
         <junit.version>4.13</junit.version>
-        <log4j.version>2.13.1</log4j.version>
+        <log4j.version>2.15.0</log4j.version>
         <groovy-all.version>2.5.10</groovy-all.version>
     </properties>
 
